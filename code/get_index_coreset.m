@@ -1,0 +1,13 @@
+function index_coreset = get_index_coreset(data, percentile_range, ...
+  coreset_oversampling, mnum_sym)
+[max_data, min_data] = get_min_max_percentile(data, ...
+  percentile_range, mnum_sym);
+multiple_valued = min_data ~= max_data;
+data = bsxfun(@minus, data(:, multiple_valued>0), ...
+  min_data(multiple_valued>0));
+% re-scale data into [0, 1]
+data = bsxfun(@times, data, ...
+  1./(max_data(multiple_valued>0) - min_data(multiple_valued>0)));
+% re-scale data into [-1, 1]
+data = -1.0 + 2.0*data;
+[~, index_coreset] = coreset_selection(data, coreset_oversampling);
